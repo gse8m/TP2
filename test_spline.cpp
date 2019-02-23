@@ -1,57 +1,58 @@
+// Copyright [2019] <SUN Hao, LIU Bohua, ZHAO Hairen>
+// header-start
+//////////////////////////////////////////////////////////////////////////////////
+//
+// \file      test_spline.cpp
+//
+// \brief     This file belongs to the C++ tutorial project
+//
+// \author    SUN, LIU, ZHAO
+//
+// \copyright Copyright ng2goodies 2015
+//            Distributed under the MIT License
+//            See http://opensource.org/licenses/MIT
+//
+//////////////////////////////////////////////////////////////////////////////////
+// header-end
+//
+
+
+// C++ version
+// Compilation with g++ 5.3.0 & g++ 6.3.0
+// mingwin: g++ -std=c++14 -O3 -o mean_and_median mean_and_median.cpp
+
+// Compilation with g++ 4.9.3
+// cygwin:  g++ -D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_DYNAMIC -std=c++14 -O3 ...
+
+// Other tool chain
+// msvc:    ok!
+// clang:   ok!
+
 #include<iostream>
 #include<Eigen/Dense>
 #include<vector>
+#include"elec4_util.h"
 
 #define N 5
-using namespace Eigen;
-using namespace std;
-
-class Spline {
-private:
-  vector<double> as_;
-  vector<double> bs_;
-  vector<double> xs_;
-
-public:
-  Spline(const vector<double> as = vector<double> (),
-	 const vector<double> bs = vector<double> (),
-	 const vector<double> xs = vector<double> ()):
-    as_(as), bs_(bs), xs_(xs) {}
-  
-  double get_value(const double x) const {
-    if (x <= 0.0 || x >= 1.0) {
-      return bs_[0];
-    }
-    for (size_t i = 0; i<N; i++) {
-      if ( x >= xs_[i] && x < xs_[i+1] )
-	return bs_[i] + as_[i] * ( x - xs_[i] );;
-    }
-  }  
-};
 
 int main(int argc, char *argv[]) {
-  vector<double> xs { 0. , 0.16, 0.42, 0.6425, 0.8575, 1};
-  vector<double> ys {100., 183., 235., 40.   , 15.   , 100};
+  std::vector<double> xs { 0. , 0.16, 0.42, 0.6425, 0.8575, 1};
+  std::vector<double> ys {100., 183., 235., 40.   , 15.   , 100};
 
-  MatrixXd deltX(N,N);
-  VectorXd deltY(N);
+  Eigen::MatrixXd deltX(N, N);
+  Eigen::VectorXd deltY(N);
 
-  for (size_t i=0; i<N; i++) {
-    deltX(i,i) = xs[i+1] - xs[i];
+  for (std::size_t i = 0; i < N; i++) {
+    deltX(i, i) = xs[i+1] - xs[i];
     deltY(i) = ys[i+1] - ys[i];
   }
-  
-  VectorXd as_ = deltX.colPivHouseholderQr().solve(deltY);
-  cout << "as_ :" << endl << as_ << endl << endl;
-  
-  vector<double> as {as_[0], as_[1], as_[2], as_[3], as_[4]};
-  //  for (size_t i=0; i<N-1; i++) {
-  // as[i]=as_(i);
-  //}
-  
-  Spline spline1(as, ys, xs);
-  
+  Eigen::VectorXd as_ = deltX.colPivHouseholderQr().solve(deltY);
+  std::cout << "as_ :" << std::endl << as_ << std::endl << std::endl;
+
+  std::vector<double> as {as_[0], as_[1], as_[2], as_[3], as_[4]};
+  ELEC4::Spline spline_r(as, ys, xs);
   for (double x = 0.0 ; x <= 1.0 ; x += 0.1) {
-    std::cout << "Value for " << x << " is " << spline1.get_value(x) << std::endl;
+    std::cout << "Value for " << x << " is " << spline_r.get_value(x);
+    std::cout << std::endl;
   }
 }

@@ -1,0 +1,33 @@
+#pragma once
+
+#include<vector>
+
+#define N 5
+
+namespace ELEC4 {
+
+class Spline {
+private:
+  std::vector<double> as_;
+  std::vector<double> bs_;
+  std::vector<double> xs_;
+
+public:
+Spline(const std::vector<double> as = std::vector<double> (),
+       const std::vector<double> bs = std::vector<double> (),
+       const std::vector<double> xs = std::vector<double> ()):
+    as_(as), bs_(bs), xs_(xs) {}
+  
+  double get_value(const double x) const {
+    if (x <= 0.0 || x >= 1.0) {
+      return bs_[0];
+    }
+  
+for (std::size_t i = 0; i<N; i++) {
+      if ( x >= xs_[i] && x < xs_[i+1] )
+	return bs_[i] + as_[i] * ( x - xs_[i] );;
+    }
+  }  
+};
+
+} // namespace ELEC4
