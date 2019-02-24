@@ -2,6 +2,7 @@
 #include<Eigen/Dense>
 #include<vector>
 
+#define N 5
 using namespace Eigen;
 using namespace std;
 
@@ -21,26 +22,32 @@ public:
     if (x <= 0.0 || x >= 1.0) {
       return bs_[0];
     }
-    for (size_t i = 0; i<4; i++) {
-      if ( x >= xs_[i] && x <= xs_[i+1] )
+    for (size_t i = 0; i<N; i++) {
+      if ( x >= xs_[i] && x < xs_[i+1] )
 	return bs_[i] + as_[i] * ( x - xs_[i] );;
     }
   }  
 };
 
 int main(int argc, char *argv[]) {
-  vector<double> xs { 0. , 0.16, 0.42, 0.6425, 0.8575 };
-  vector<double> ys {100., 183., 235., 40.   , 15.    };
-  MatrixXd deltX(4,4);
-  VectorXd deltY(4);
+  vector<double> xs { 0. , 0.16, 0.42, 0.6425, 0.8575, 1};
+  vector<double> ys {100., 183., 235., 40.   , 15.   , 100};
 
-  for (size_t i=0; i<4; i++) {
+  MatrixXd deltX(N,N);
+  VectorXd deltY(N);
+
+  for (size_t i=0; i<N; i++) {
     deltX(i,i) = xs[i+1] - xs[i];
     deltY(i) = ys[i+1] - ys[i];
   }
+  
   VectorXd as_ = deltX.colPivHouseholderQr().solve(deltY);
-  cout << "as_ :" << endl << as_ <<endl;
-  vector<double> as {as_[0], as_[1], as_[2], as_[3]};
+  cout << "as_ :" << endl << as_ << endl << endl;
+  
+  vector<double> as {as_[0], as_[1], as_[2], as_[3], as_[4]};
+  //  for (size_t i=0; i<N-1; i++) {
+  // as[i]=as_(i);
+  //}
   
   Spline spline1(as, ys, xs);
   
